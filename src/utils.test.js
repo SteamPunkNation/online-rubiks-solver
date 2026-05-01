@@ -8,6 +8,9 @@ import {
   rgbToLab,
   closestPaletteColor,
   createEmptyFaces,
+  FACE_ORDER,
+  PALETTE,
+  TURN_CONFIG
 } from './utils'
 
 describe('formatTime', () => {
@@ -17,22 +20,31 @@ describe('formatTime', () => {
     expect(formatTime(61000)).toBe('01:01')
     expect(formatTime(3600000)).toBe('60:00')
   })
+
+  it('pads single digit minutes and seconds', () => {
+    expect(formatTime(1000)).toBe('00:01')
+    expect(formatTime(60000)).toBe('01:00')
+    expect(formatTime(125000)).toBe('02:05')
+  })
 })
 
 describe('invertTurn', () => {
   it('inverts single moves correctly', () => {
     expect(invertTurn('U')).toBe("U'")
     expect(invertTurn('R')).toBe("R'")
+    expect(invertTurn('F')).toBe("F'")
   })
 
   it('inverts prime moves correctly', () => {
     expect(invertTurn("U'")).toBe('U')
     expect(invertTurn("D'")).toBe('D')
+    expect(invertTurn("B'")).toBe('B')
   })
 
   it('keeps double moves the same', () => {
     expect(invertTurn('U2')).toBe('U2')
     expect(invertTurn('R2')).toBe('R2')
+    expect(invertTurn('F2')).toBe('F2')
   })
 })
 
@@ -45,6 +57,12 @@ describe('Color Logic Engine', () => {
     expect(normalized[0]).toBe(180)
     expect(normalized[1]).toBe(90)
     expect(normalized[2]).toBe(45)
+  })
+
+  it('normalizeRgb limits values correctly', () => {
+    // Math.min(255) ensures values don't exceed color bounds
+    const maxScaled = normalizeRgb(255, 255, 255)
+    expect(maxScaled).toEqual([240, 240, 240]) // using scale logic (240/255)
   })
 
   it('rgbToXyz converts properly (spot check)', () => {
@@ -83,6 +101,25 @@ describe('Color Logic Engine', () => {
     
     // Pure Yellow
     expect(closestPaletteColor(255, 255, 0).key).toBe('Y')
+  })
+})
+
+describe('Constant Definitions', () => {
+  it('FACE_ORDER contains exactly 6 faces in correct order', () => {
+    expect(FACE_ORDER).toEqual(['U', 'R', 'F', 'D', 'L', 'B'])
+    expect(FACE_ORDER.length).toBe(6)
+  })
+
+  it('PALETTE contains exactly 6 standard Rubik defaults', () => {
+    expect(PALETTE.length).toBe(6)
+    const keys = PALETTE.map(c => c.key)
+    expect(keys).toEqual(expect.arrayContaining(['W', 'Y', 'R', 'O', 'B', 'G']))
+  })
+
+  it('TURN_CONFIG maps standard moves correctly', () => {
+    expect(TURN_CONFIG.U).toBeDefined()
+    expect(TURN_CONFIG.R).toBeDefined()
+    expect(TURN_CONFIG.F.axis).toBe('z')
   })
 })
 

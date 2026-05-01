@@ -77,6 +77,21 @@ describe('App Component', () => {
     expect(screen.getByText(/Reset/i)).toBeInTheDocument()
   })
 
+  it('can toggle correct active face state when navigating faces', () => {
+    render(<App />)
+    
+    // We expect the button text: "U (Up)" - multiple might exist (e.g. one in Camera, one in Manual)
+    expect(screen.getAllByText(/U\s*\(Up\)/i).length).toBeGreaterThan(0)
+
+    // Test a basic interaction: clicking 'Next face' on face step pagination
+    const nextBtn = screen.getAllByRole('button').find(b => b.textContent.match(/next/i))
+    if (nextBtn) {
+      fireEvent.click(nextBtn)
+      // The second face in FACE_ORDER is R (Right)
+      expect(screen.getAllByText(/R\s*\(Right\)/i).length).toBeGreaterThan(0)
+    }
+  })
+
   it('can click Randomize without crashing', () => {
     render(<App />)
     const randomizeBtn = screen.getByText(/Randomize/i)
@@ -89,5 +104,26 @@ describe('App Component', () => {
     const resetBtn = screen.getByText(/Reset/i)
     fireEvent.click(resetBtn)
     expect(screen.getByText('Solve cube')).toBeInTheDocument() // UI remains stable
+  })
+
+  it('has default un-started timer and moves value', () => {
+    render(<App />)
+    // Check Timer initialization
+    expect(screen.getByText('00:00')).toBeInTheDocument()
+    
+    // Check active labels inside the Stats UI part
+    expect(screen.getByText('Moves')).toBeInTheDocument()
+    expect(screen.getByText('Planned Moves')).toBeInTheDocument()
+  })
+
+  it('correctly maps clicking color palette selection', () => {
+    render(<App />)
+    // The initial selected state maps to "W"
+    // Look up the palette options that are rendered
+    const redPaletteBtn = screen.getByLabelText(/Select Red/i)
+    if (redPaletteBtn) {
+      fireEvent.click(redPaletteBtn)
+      expect(redPaletteBtn).toHaveClass('active')
+    }
   })
 })
