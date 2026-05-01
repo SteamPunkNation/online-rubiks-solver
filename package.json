@@ -12,10 +12,10 @@
     "postinstall": "node -e \"const fs = require('fs'); const p = 'node_modules/cubejs/lib/solve.js'; if(fs.existsSync(p)) { fs.writeFileSync(p, fs.readFileSync(p, 'utf8').replace('Cube = this.Cube ||', 'Cube = (typeof this !== \\'undefined\\' ? this.Cube : globalThis.Cube) ||')); }\""
   },
   "dependencies": {
-    "cubejs": "^1.1.0",
+    "cubejs": "^1.3.2",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "three": "^0.178.0"
+    "three": "^0.184.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
