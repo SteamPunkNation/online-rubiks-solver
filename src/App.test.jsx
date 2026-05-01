@@ -73,8 +73,8 @@ describe('App Component', () => {
     expect(screen.getByText(/Capture face/i)).toBeInTheDocument()
     expect(screen.getByText(/Manual Entry/i)).toBeInTheDocument()
     expect(screen.getByText('Solve cube')).toBeInTheDocument()
-    expect(screen.getByText(/Randomize/i)).toBeInTheDocument()
-    expect(screen.getByText(/Reset/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/Randomize/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/Reset/i).length).toBeGreaterThan(0)
   })
 
   it('can toggle correct active face state when navigating faces', () => {
@@ -94,15 +94,15 @@ describe('App Component', () => {
 
   it('can click Randomize without crashing', () => {
     render(<App />)
-    const randomizeBtn = screen.getByText(/Randomize/i)
-    fireEvent.click(randomizeBtn)
+    const randomizeBtns = screen.getAllByText(/Randomize/i)
+    fireEvent.click(randomizeBtns[0])
     expect(screen.getByText('Solve cube')).toBeInTheDocument() // UI remains stable
   })
 
   it('can click Reset without crashing', () => {
     render(<App />)
-    const resetBtn = screen.getByText(/Reset/i)
-    fireEvent.click(resetBtn)
+    const resetBtns = screen.getAllByText(/Reset/i)
+    fireEvent.click(resetBtns[0])
     expect(screen.getByText('Solve cube')).toBeInTheDocument() // UI remains stable
   })
 

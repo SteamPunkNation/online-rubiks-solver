@@ -13,6 +13,7 @@ import {
   FACE_COLOR_MAP,
   createEmptyFaces,
   invertTurn,
+  generateScramble,
   formatTime,
   normalizeRgb,
   rgbToXyz,
@@ -390,6 +391,8 @@ function App() {
   const [cubeFaces, setCubeFaces] = useState(() => createEmptyFaces())
   const [solutionMoves, setSolutionMoves] = useState([])
   const [solutionError, setSolutionError] = useState('')
+  const [scrambleSequence, setScrambleSequence] = useState([])
+  const [scrambleLength, setScrambleLength] = useState(20)
   const [aiHint, setAiHint] = useState('')
   const [isGeneratingHint, setIsGeneratingHint] = useState(false)
   const [showBackToTop, setShowBackToTop] = useState(false)
@@ -1041,9 +1044,17 @@ function App() {
       setSolutionError('Randomizer unavailable. Please refresh or reinstall dependencies.')
       return
     }
-    const randomCube = lib.random()
-    const facelets = randomCube.asString()
-    setCubeFaces(faceletStringToFaces(facelets))
+    const newScramble = generateScramble(scrambleLength)
+    setScrambleSequence(newScramble)
+    
+    // Convert scramble moves to final face state using applyMoveToFaces
+    let nextFaces = createEmptyFaces()
+    // Kociemba library might be cleaner to just parse using Cube string directly if we want
+    // but the scramble string needs to match the visual cube
+    const cube = new lib()
+    cube.move(newScramble.join(' '))
+    setCubeFaces(faceletStringToFaces(cube.asString()))
+
     setSolutionMoves([])
     setIsSolving(false)
     setElapsedMs(0)
@@ -1142,6 +1153,7 @@ function App() {
     setMoves(0)
     setCurrentStep(0)
     setAiHint('')
+    setScrambleSequence([])
     setCubeFaces(createEmptyFaces())
     stopCamera()
   }
@@ -1343,13 +1355,39 @@ function App() {
             <div>
               <h2>3D Cube Preview</h2>
               <p>Preview the detected state and play the solution animation.</p>
+              {scrambleSequence.length > 0 && !isSolving && (
+                <div style={{ marginTop: '10px', padding: '8px', background: 'var(--surface-color)', borderRadius: '4px', border: '1px solid var(--border-color)', fontSize: '0.9rem', color: 'var(--text-color)' }}>
+                  <div style={{ marginBottom: '4px' }}>
+                    <strong>Scramble: </strong> {scrambleSequence.join(' ')}
+                  </div>
+                  <div style={{ fontSize: '0.85rem', opacity: 0.8 }}>
+                    <em>Orientation: White face on Top, Green face on Front</em>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="panel-actions">
+            <div className="panel-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <label htmlFor="scramble-length" style={{ fontSize: '0.85rem' }}>Length:</label>
+                <input
+                  id="scramble-length"
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={scrambleLength}
+                  onChange={(e) => setScrambleLength(Number(e.target.value) || 20)}
+                  style={{ width: '50px', padding: '4px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--surface-color)', color: 'var(--text-color)' }}
+                  disabled={isSolving}
+                />
+              </div>
               <button className="primary" type="button" onClick={handleStart}>
                 {isSolving ? 'Solving...' : 'Solve cube'}
               </button>
-              <button className="ghost" type="button" onClick={handleRandomize}>
+              <button className="ghost" type="button" onClick={handleRandomize} disabled={isSolving}>
                 Randomize
+              </button>
+              <button className="ghost" type="button" onClick={handleReset} disabled={isSolving}>
+                Reset
               </button>
               <button
                 className="ghost"

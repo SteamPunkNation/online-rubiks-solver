@@ -50,6 +50,35 @@ export const invertTurn = (turn) => {
   return turn.includes("'") ? turn[0] : turn + "'"
 }
 
+export const generateScramble = (length = 20) => {
+  const faces = ['U', 'D', 'L', 'R', 'F', 'B']
+  const modifiers = ['', "'", '2']
+  const scramble = []
+  
+  for (let i = 0; i < length; i++) {
+    let randomFace
+    do {
+      randomFace = faces[Math.floor(Math.random() * faces.length)]
+    } while (
+      // Prevent consecutive identical faces (e.g. U U')
+      (i > 0 && randomFace === scramble[i - 1][0]) ||
+      // Prevent overlapping opposites (e.g. U D U)
+      (i > 1 && randomFace === scramble[i - 2][0] && 
+        ((randomFace === 'U' && scramble[i - 1][0] === 'D') ||
+         (randomFace === 'D' && scramble[i - 1][0] === 'U') ||
+         (randomFace === 'L' && scramble[i - 1][0] === 'R') ||
+         (randomFace === 'R' && scramble[i - 1][0] === 'L') ||
+         (randomFace === 'F' && scramble[i - 1][0] === 'B') ||
+         (randomFace === 'B' && scramble[i - 1][0] === 'F')))
+    )
+    
+    const randomModifier = modifiers[Math.floor(Math.random() * modifiers.length)]
+    scramble.push(randomFace + randomModifier)
+  }
+  
+  return scramble
+}
+
 export const formatTime = (ms) => {
   const totalSeconds = Math.floor(ms / 1000)
   const minutes = Math.floor(totalSeconds / 60)
