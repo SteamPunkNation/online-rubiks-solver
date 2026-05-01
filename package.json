@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "vitest",
+    "test:ci": "vitest run",
     "postinstall": "node -e \"const fs = require('fs'); const p = 'node_modules/cubejs/lib/solve.js'; if(fs.existsSync(p)) { fs.writeFileSync(p, fs.readFileSync(p, 'utf8').replace('Cube = this.Cube ||', 'Cube = (typeof this !== \\'undefined\\' ? this.Cube : globalThis.Cube) ||')); }\""
   },
   "dependencies": {
@@ -16,7 +18,11 @@
     "three": "^0.178.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@vitejs/plugin-react": "^6.0.1",
-    "vite": "^8.0.10"
+    "jsdom": "^29.1.1",
+    "vite": "^8.0.10",
+    "vitest": "^4.1.5"
   }
 }
